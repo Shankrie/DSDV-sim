@@ -11,6 +11,10 @@ body {
 	background-color: #313131;
 }
 
+p {
+    margin: 0.2em 0.4em 0.2em 0.4em;
+}
+
 #header {
 	margin: 0 0 0 0;
 	
@@ -48,35 +52,41 @@ body {
 	border: 1px solid gray; 
 }
 
+.node-info-container {
+    position: relative;
+
+    padding: 0.5em 0.5em 0.5em 0.5em;
+}
+
 .node-info {
 	position: absolute;
-	margin: 0 0 0 0;
 	top: 2.5em;
 	left: 0;
 
-	display: inline-block;
+	display: inline;
 	overflow: hidden;
 
 	background-color: gray;
-	padding: 0 0 0 0;
 	border: 1px solid gray;
 	opacity: 0.7;
+    padding: 0.3em 0.2em 0.3em 0.2em;
+    white-space: nowrap;
 }
 
-.node-info-container {
-	position: relative;
+.node-info div {
+    display: inline-block;
+    vertical-align:top;
+
+    font-family: Arial;
+    font-size: 0.8em;
+    color: white;
+    white-space: nowrap;
 }
 
-.node-info p {
-	margin: 0.5em 0.5em 0.5em 0.5em;
-	
-	display: inline-block;
-
-	font-family: Arial;
-	font-size: 0.8em;
-	color: white;
-
-	white-space: nowrap;	
+.destination-info {
+    position: relative;
 }
 
-
+.hop-count-info {
+    position: relative;
+}

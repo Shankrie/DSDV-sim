@@ -33,9 +33,42 @@ $(document).ready(function() {
 
         nodeInfoContainer = document.createElement('div');
 		nodeInfoContainer.className = 'node-info-container';
-		nodeInfo = document.createElement('div');
+
+        nodeInfo = document.createElement('div');
         nodeInfo.className = 'node-info';
-        nodeInfo.innerHTML = '<p>' + 'Destination: ' + this.table[0].destination + ' | Next hop: ' + this.table[0].nextHop + '</p>';
+        //nodeInfo.innerHTML = '<p>' + 'Destination: ' + this.table[0].destination + ' | Next hop: ' + this.table[0].nextHop + '</p>';
+
+        destinationInfo = document.createElement('div');
+        destinationInfo.className = 'destination-info';
+        columnTitle = document.createElement('p');
+        columnTitle.innerHTML = 'Destination';
+        destinationInfo.appendChild(columnTitle);
+        nodeInfo.appendChild(destinationInfo)
+
+        nextHopInfo = document.createElement('div');
+        nextHopInfo.className = 'next-hop-info';
+        columnTitle = document.createElement('p');
+        columnTitle.innerHTML = 'Next hop';
+        nextHopInfo.appendChild(columnTitle);
+        nodeInfo.appendChild(nextHopInfo);
+
+        hopCountInfo = document.createElement('div');
+        hopCountInfo.className = 'hop-count-info';
+        columnTitle = document.createElement('p');
+        columnTitle.innerHTML = 'Hop count';
+        hopCountInfo.appendChild(columnTitle);
+        nodeInfo.appendChild(hopCountInfo);
+
+        seqNoInfo = document.createElement('div');
+        seqNoInfo.className = 'seq-no-info';
+        columnTitle = document.createElement('p');
+        columnTitle.innerHTML = 'Seq. No.';
+        seqNoInfo.appendChild(columnTitle);
+        nodeInfo.appendChild(seqNoInfo);
+
+        ownInfo = document.createElement('p');
+        ownInfo.innerHTML = this.name;
+        destinationInfo.appendChild(ownInfo);
 
 		nodeInfoContainer.appendChild(nodeInfo);
 		$(this.blockInstance).append(nodeInfoContainer);
@@ -86,7 +119,8 @@ $(document).ready(function() {
                     var y2 = nodes[j].blockInstance.offsetLeft;
 
                     var distance = Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
-                    if (distance < 1300) {
+
+                    if (distance < 400) {
                         var alreadyIn = false;
                         for (var k = 0; k < nodes[j].table.length; k++) {
                             if (nodes[j].table[k].destination == nodes[i].name) {
@@ -96,12 +130,11 @@ $(document).ready(function() {
                         if (alreadyIn) {
                             
                         } else {
-                            nodes[j].table.push({destination: nodes[j].name, nextHop: 0, hopCount: nodes[i].table[0].hopCount + 1, seqNo: 0})
-                            var infoBlock = nodes[j].blockInstance.getElementsByClassName('node-info');
+                            nodes[j].table.push({destination: nodes[i].name, nextHop: 0, hopCount: 0, seqNo: 0})
+                            var infoBlock = nodes[j].blockInstance.getElementsByClassName('destination-info');
                             newInfo = document.createElement('p');
-                            newInfo.innerHTML = nodes[i].table[nodes[i].table.length - 1].destination;
+                            newInfo.innerHTML = nodes[i].table[0].destination;
                             infoBlock[0].appendChild(newInfo);
-                            alert(infoBlock[0].innerText);
                         }
                     }
                 }
