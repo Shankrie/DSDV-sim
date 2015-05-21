@@ -1,11 +1,8 @@
 $(document).ready(function() {
-	$('#header').click(function(e) {
-		alert("hi");
-	});
-
 	var width = $(window).width();
 	var height = $(window).height();
 	var blockSize = $("#header").width();
+
 	var blocksHor = Math.floor(width / blockSize);
 	var blocksVer = Math.floor(height / blockSize);
 	
@@ -16,6 +13,10 @@ $(document).ready(function() {
 	blocksVer = Math.floor(height / blockSize);
 	
 	var blocksNeeded = blocksHor * blocksVer;
+
+    $("#header").css({
+        'width' : '98.9%'
+    })
 
 	var i = 0;
 	
@@ -62,7 +63,7 @@ $(document).ready(function() {
         seqNoInfo = document.createElement('div');
         seqNoInfo.className = 'seq-no-info';
         columnTitle = document.createElement('p');
-        columnTitle.innerHTML = 'Seq. No.';
+        columnTitle.innerHTML = 'Seq';
         seqNoInfo.appendChild(columnTitle);
         nodeInfo.appendChild(seqNoInfo);
 
@@ -71,16 +72,18 @@ $(document).ready(function() {
         destinationInfo.appendChild(ownInfo);
 
         ownInfo = document.createElement('p');
+        ownInfo.className = 'next-hop-row';
         ownInfo.innerHTML = this.name;
         nextHopInfo.appendChild(ownInfo);
 
         ownInfo = document.createElement('p');
+        ownInfo.className = 'hop-count-row';
         ownInfo.innerHTML = '0';
         hopCountInfo.appendChild(ownInfo);
 
         ownInfo = document.createElement('p');
+        ownInfo.className = 'seq-no-row';
         ownInfo.innerHTML = this.name + '-0';
-        ownInfo.className = 'seq-no';
         seqNoInfo.appendChild(ownInfo);
 
 		nodeInfoContainer.appendChild(nodeInfo);
@@ -121,8 +124,49 @@ $(document).ready(function() {
         }
     });
 
+    $('#route-search').click(function(e) {
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].blockInstance.style.backgroundColor = 'white';
+        }
+
+        var formElements = $('form').serializeArray();
+        var from, to;
+        for (var i = 0; i < formElements.length; i++) {
+            if (formElements[i].name == "from") {
+                from = parseInt(formElements[i].value);
+            }
+            if (formElements[i].name == "to") {
+                to = parseInt(formElements[i].value);
+            }
+        }
+
+        var i = from;
+        var nodeToCheck;
+        while (i != to) {
+            for (var j = 0; j < nodes.length; j++) {
+                if (nodes[j].name == i) {
+                    nodeToCheck = nodes[j];
+                }
+            }
+            for (var j = 0; j < nodeToCheck.table.length; j++) {
+                if (nodeToCheck.table[j].destination == to) {
+                    i = nodeToCheck.table[j].nextHop;
+                    nodeToCheck.blockInstance.style.backgroundColor = '#2495AF';
+                }
+            }
+        }
+        for (var j = 0; j < nodes.length; j++) {
+            if (nodes[j].name == i) {
+                nodeToCheck = nodes[j];
+                nodeToCheck.blockInstance.style.backgroundColor = '#2495AF';
+            }
+        }
+
+    });
+
     setInterval(function () {
         for (var i = 0; i < nodes.length; i++) {
+            nodes[i].table[0].seqNo += 2;
             for (var j = 0; j < nodes.length; j++) {
                 if (nodes[i] != nodes[j]) {
                     var x1 = nodes[i].blockInstance.offsetTop;
@@ -134,34 +178,58 @@ $(document).ready(function() {
                     var distance = Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
 
                     if (distance < 400) {
-
-                        for (var k = 0; k < nodes[i].table.length; k++) {
+                        var k, l;
+                        for (k = 0; k < nodes[i].table.length; k++) {
                             var alreadyIn = false;
-                            for (var l = 0; l < nodes[j].table.length; l++) {
+                            var needsUpdating = false;
+                            for (l = 0; l < nodes[j].table.length; l++) {
                                 if (nodes[i].table[k].destination == nodes[j].table[l].destination) {
                                     alreadyIn = true;
+                                    if (nodes[i].table[k].seqNo > nodes[j].table[l].seqNo) {
+                                        needsUpdating = true;
+                                    }
+                                    break;
                                 }
                                 if (nodes[i].name == 1 && nodes[i].table[k].destination == 2 && nodes[j].name == 0) {
                                     //alert(nodes[j].table[l].destination);
                                 }
                             }
 
+                            var destination = nodes[i].table[k].destination;
+                            var nextHop = nodes[i].name;
+                            var hopCount = nodes[i].table[k].hopCount + 1;
+                            var seqNo = nodes[i].table[k].seqNo;
 
+                            var column, row, newInfo;
 
                             if (alreadyIn) {
+                                if (needsUpdating) {
 
+                                    seqNo = nodes[i].table[k].seqNo;
+
+                                    column = nodes[i].blockInstance.getElementsByClassName('seq-no-row');
+                                    column[0].innerHTML = nextHop + '-' + seqNo;
+
+                                    nodes[j].table[l].nextHop = nextHop;
+                                    nodes[j].table[l].hopCount = hopCount;
+                                    nodes[j].table[l].seqNo = seqNo;
+
+                                    row = nodes[j].blockInstance.getElementsByClassName('next-hop-row');
+                                    row[l].innerHTML = nextHop;
+
+                                    row = nodes[j].blockInstance.getElementsByClassName('hop-count-row');
+                                    row[l].innerHTML = hopCount;
+
+                                    row = nodes[j].blockInstance.getElementsByClassName('seq-no-row');
+                                    row[l].innerHTML = destination + '-' +seqNo;
+                                }
                             } else {
-                                nodes[i].table[k].seqNo++;
 
-                                var destination = nodes[i].table[k].destination;
-                                var nextHop = nodes[i].name;
-                                var hopCount = nodes[i].table[k].hopCount + 1;
-                                var seqNo = nodes[i].table[k].seqNo;
 
-                                var column, newInfo;
+                                seqNo = nodes[i].table[k].seqNo;
 
-                                column = nodes[i].blockInstance.getElementsByClassName('seq-no');
-                                column[0].innerHTML = destination + '-' + seqNo;
+                                column = nodes[i].blockInstance.getElementsByClassName('seq-no-row');
+                                column[0].innerHTML = nextHop + '-' + seqNo;
 
                                 nodes[j].table.push({
                                     destination: destination,
@@ -172,23 +240,25 @@ $(document).ready(function() {
 
                                 column = nodes[j].blockInstance.getElementsByClassName('destination-info');
                                 newInfo = document.createElement('p');
-                                newInfo.innerHTML = destination
+                                newInfo.innerHTML = destination;
                                 column[0].appendChild(newInfo);
 
                                 column = nodes[j].blockInstance.getElementsByClassName('next-hop-info');
                                 newInfo = document.createElement('p');
                                 newInfo.innerHTML = nextHop;
+                                newInfo.className = 'next-hop-row';
                                 column[0].appendChild(newInfo);
 
                                 column = nodes[j].blockInstance.getElementsByClassName('hop-count-info');
                                 newInfo = document.createElement('p');
                                 newInfo.innerHTML = hopCount;
+                                newInfo.className = 'hop-count-row';
                                 column[0].appendChild(newInfo);
 
                                 column = nodes[j].blockInstance.getElementsByClassName('seq-no-info');
                                 newInfo = document.createElement('p');
-                                newInfo.innerHTML = seqNo;
-                                newInfo.className = 'seq-no';
+                                newInfo.innerHTML = destination + '-' + seqNo;
+                                newInfo.className = 'seq-no-row';
                                 column[0].appendChild(newInfo);
                             }
                         }
