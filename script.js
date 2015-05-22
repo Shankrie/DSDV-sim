@@ -97,6 +97,7 @@ $(document).ready(function() {
     $(document).on( "click", ".block", function() {
         $(this).removeClass('block');
         $(this).addClass('node');
+        this.style.backgroundColor = 'white';
 
         //var node1 = new Node(this);
         //nodes.push(node1);
@@ -116,10 +117,15 @@ $(document).ready(function() {
     $(document).on( "click", ".node", function() {
         $(this).removeClass('node');
         $(this).addClass('block');
+        this.style.backgroundColor = '#313131';
 
         for (var i = 0; i < nodes.length; i++) {
             if(nodes[i].blockInstance == this) {
                 nodes[i].removeInfo();
+                nodes[i].blockInstance.style.backgroundColor = '#313131';
+                //nodes.splice(i, 1);
+
+                break;
             }
         }
     });
